@@ -5,22 +5,38 @@
 //
 // var indexRouter = require("./routes/index");
 // var usersRouter = require("./routes/users");
-import { GraphQLServer } from "graphql-yoga";
+import {GraphQLServer} from "graphql-yoga";
 
 //var app = express();
 const typeDefs = `
   type Query {
-    greeting(stuff: String): String!
-    name: String!
+    id: ID!
+    name:String!
+    age: Int!
+    employed:Boolean!
+    gpa: Float
   }
 `;
 const resolvers = {
   Query: {
-    greeting: (parent, { stuff }, ctx, info) => "hi there " + stuff,
-    name: () => "hi there"
+    id() {
+      return "abad";
+    },
+    name() {
+      return "Stan";
+    },
+    age() {
+      return 22;
+    },
+    employed() {
+      return false;
+    },
+    gpa() {
+      return null;
+    }
   }
 };
-const server = new GraphQLServer({ typeDefs, resolvers });
+const server = new GraphQLServer({typeDefs, resolvers});
 // app.use(logger("dev"));
 // app.use(express.json());
 // app.use(express.urlencoded({extended: false}));
