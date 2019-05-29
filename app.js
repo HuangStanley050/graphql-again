@@ -1,33 +1,40 @@
-// var express = require("express");
-// var path = require("path");
-// var cookieParser = require("cookie-parser");
-// var logger = require("morgan");
-//
-// var indexRouter = require("./routes/index");
-// var usersRouter = require("./routes/users");
-import { GraphQLServer } from "graphql-yoga";
+import {GraphQLServer} from "graphql-yoga";
 
 //var app = express();
 const typeDefs = `
   type Query {
-    greeting(stuff: String): String!
-    name: String!
+   me: User!
+   post: Post!
+  }
+  type Post {
+    id:ID!
+    title:String!
+    body:String!
+    published:String!
+  }
+  type User {
+    id:ID!
+    email:String!
+    name:String!
+    age: Int
   }
 `;
 const resolvers = {
   Query: {
-    greeting: (parent, { stuff }, ctx, info) => "hi there " + stuff,
-    name: () => "hi there"
+    post: () => ({
+      id: "asdfsadf",
+      title: "wow that's huge",
+      body: "la la la",
+      published: "june 1st"
+    }),
+    me: () => ({
+      id: "asdfas",
+      email: "infamous_godhand@yahoo.com",
+      name: "Stanley",
+      age: 38
+    })
   }
 };
-const server = new GraphQLServer({ typeDefs, resolvers });
-// app.use(logger("dev"));
-// app.use(express.json());
-// app.use(express.urlencoded({extended: false}));
-// app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, "public")));
-
-// app.use("/", indexRouter);
-// app.use("/users", usersRouter);
+const server = new GraphQLServer({typeDefs, resolvers});
 
 server.start(() => console.log("Server is running on localhost:4000"));
