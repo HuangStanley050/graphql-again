@@ -1,11 +1,4 @@
-// var express = require("express");
-// var path = require("path");
-// var cookieParser = require("cookie-parser");
-// var logger = require("morgan");
-//
-// var indexRouter = require("./routes/index");
-// var usersRouter = require("./routes/users");
-import {GraphQLServer} from "graphql-yoga";
+import { GraphQLServer } from "graphql-yoga";
 
 //var app = express();
 const typeDefs = `
@@ -36,7 +29,7 @@ const resolvers = {
     }
   }
 };
-const server = new GraphQLServer({typeDefs, resolvers});
+const server = new GraphQLServer({ typeDefs, resolvers });
 // app.use(logger("dev"));
 // app.use(express.json());
 // app.use(express.urlencoded({extended: false}));
