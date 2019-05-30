@@ -1,4 +1,4 @@
-import { GraphQLServer } from "graphql-yoga";
+import {GraphQLServer} from "graphql-yoga";
 
 //var app = express();
 const users = [
@@ -41,10 +41,37 @@ const posts = [
     author: "3"
   }
 ];
+const comments = [
+  {
+    id: "24",
+    text: "I am comment1",
+    author: "2",
+    post: "21"
+  },
+  {
+    id: "25",
+    text: "I am comment2",
+    author: "1",
+    post: "33"
+  },
+  {
+    id: "26",
+    text: "I am comment3",
+    author: "2",
+    post: "10"
+  },
+  {
+    id: "27",
+    text: "I am comment4",
+    author: "3",
+    post: "10"
+  }
+];
 const typeDefs = `
   type Query {
     users(query:String): [User]!
     posts(query:String): [Post]!
+    comments: [Comment]!
     me: User!
     post: Post!
     greeting(name:String): String!
@@ -58,12 +85,20 @@ const typeDefs = `
     gpa: Float
   }
 
+  type Comment {
+    id:ID!
+    text:String!
+    author: User!
+    post: Post!
+  }
+
   type User {
     id:ID!
     email:String!
     name:String!
     age: Int
     posts:[Post!]!
+    comments:[Comment!]!
   }
 
   type Post {
@@ -72,10 +107,14 @@ const typeDefs = `
     body:String!
     published:Boolean!
     author: User!
+    comments: [Comment!]!
   }
 `;
 const resolvers = {
   Query: {
+    comments: (parent, args, ctx, info) => {
+      return comments;
+    },
     posts: (parent, args, ctx, info) => {
       if (!args.query) {
         return posts;
@@ -129,15 +168,25 @@ const resolvers = {
       return null;
     }
   },
+  Comment: {
+    author: (parent, args, ctx, info) =>
+      users.find(user => parent.author === user.id),
+    post: (parent, args, ctx, info) =>
+      posts.find(post => post.id === parent.post)
+  },
   Post: {
     author: (parent, args, ctx, info) =>
-      users.find(user => parent.author === user.id)
+      users.find(user => parent.author === user.id),
+    comments: (parent, args, ctx, info) =>
+      comments.filter(comment => comment.post === parent.id)
   },
   User: {
     posts: (parent, args, ctx, info) =>
-      posts.filter(post => parent.id === post.author)
+      posts.filter(post => parent.id === post.author),
+    comments: (parent, args, ctx, info) =>
+      comments.filter(comment => parent.id === comment.author)
   }
 };
-const server = new GraphQLServer({ typeDefs, resolvers });
+const server = new GraphQLServer({typeDefs, resolvers});
 
 server.start(() => console.log("Server is running on localhost:4000"));
