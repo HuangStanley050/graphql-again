@@ -1,8 +1,12 @@
-import { GraphQLServer } from "graphql-yoga";
+import {GraphQLServer} from "graphql-yoga";
 
 //var app = express();
 const typeDefs = `
   type Query {
+    greeting(name:String): String!
+    float(num1:Float!,num2:Float!):Float!
+    add(number: [Float!]!): Float!
+    grades: [Int!]!
     id: ID!
     name:String!
     age: Int!
@@ -12,6 +16,20 @@ const typeDefs = `
 `;
 const resolvers = {
   Query: {
+    grades: (parent, args, ctx, info) => {
+      return [99, 22, 54, 88];
+    },
+    add: (parent, args, ctx, info) => {
+      if (args.number.length === 0) {
+        return 0;
+      } else {
+        return args.number.reduce((accumulator, currentValue) => {
+          return accumulator + currentValue;
+        });
+      }
+    },
+    float: (parent, args, ctx, info) => args.num1 + args.num2,
+    greeting: (parent, args, ctx, info) => "hello " + args.name,
     id() {
       return "abad";
     },
@@ -29,14 +47,6 @@ const resolvers = {
     }
   }
 };
-const server = new GraphQLServer({ typeDefs, resolvers });
-// app.use(logger("dev"));
-// app.use(express.json());
-// app.use(express.urlencoded({extended: false}));
-// app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, "public")));
-
-// app.use("/", indexRouter);
-// app.use("/users", usersRouter);
+const server = new GraphQLServer({typeDefs, resolvers});
 
 server.start(() => console.log("Server is running on localhost:4000"));
