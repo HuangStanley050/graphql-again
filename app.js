@@ -1,4 +1,4 @@
-import {GraphQLServer} from "graphql-yoga";
+import { GraphQLServer } from "graphql-yoga";
 import uuidv4 from "uuid/v4";
 //var app = express();
 const users = [
@@ -87,6 +87,8 @@ const typeDefs = `
 
   type Mutation {
     createUser(name:String!,email:String!,age:Int):User!
+    createPost(title:String!,body:String!,published:Boolean!,author:ID!):Post!
+    createComment(text:String!,author:ID!,post:ID!): Comment!
   }
 
   type Comment {
@@ -173,6 +175,21 @@ const resolvers = {
     }
   },
   Mutation: {
+    createPost: (parent, args, ctx, info) => {
+      const userExists = users.some(user => user.id === args.author);
+      if (!userExists) {
+        throw new Error("User doesn't exist");
+      }
+      const post = {
+        id: uuidv4(),
+        title: args.title,
+        body: args.body,
+        published: args.published,
+        author: args.author
+      };
+      posts.push(post);
+      return post;
+    },
     createUser: (parent, args, ctx, info) => {
       const emailTaken = users.some(user => args.email === user.email);
       if (emailTaken) {
@@ -186,6 +203,26 @@ const resolvers = {
       };
       users.push(user);
       return user;
+    },
+    createComment: (parent, args, ctx, info) => {
+      const userExists = users.some(user => user.id === args.author);
+      const postExists = posts.some(
+        post => post.id === args.post && post.published
+      );
+
+      if (!userExists || !postExists) {
+        throw new Error(
+          "User doesn't exists or the post hasn't been published"
+        );
+      }
+      const comment = {
+        id: uuidv4(),
+        text: args.text,
+        post: args.post,
+        author: args.author
+      };
+      comments.push(comment);
+      return comment;
     }
   },
   Comment: {
@@ -207,6 +244,6 @@ const resolvers = {
       comments.filter(comment => parent.id === comment.author)
   }
 };
-const server = new GraphQLServer({typeDefs, resolvers});
+const server = new GraphQLServer({ typeDefs, resolvers });
 
 server.start(() => console.log("Server is running on localhost:4000"));
