@@ -1,5 +1,5 @@
 import {GraphQLServer} from "graphql-yoga";
-
+import uuidv4 from "uuid/v4";
 //var app = express();
 const users = [
   {
@@ -85,6 +85,10 @@ const typeDefs = `
     gpa: Float
   }
 
+  type Mutation {
+    createUser(name:String!,email:String!,age:Int):User!
+  }
+
   type Comment {
     id:ID!
     text:String!
@@ -166,6 +170,22 @@ const resolvers = {
     },
     gpa() {
       return null;
+    }
+  },
+  Mutation: {
+    createUser: (parent, args, ctx, info) => {
+      const emailTaken = users.some(user => args.email === user.email);
+      if (emailTaken) {
+        throw new Error("User email already exist");
+      }
+      const user = {
+        id: uuidv4(),
+        email: args.email,
+        name: args.name,
+        age: args.age
+      };
+      users.push(user);
+      return user;
     }
   },
   Comment: {
