@@ -1,4 +1,4 @@
-import {GraphQLServer} from "graphql-yoga";
+import { GraphQLServer } from "graphql-yoga";
 import uuidv4 from "uuid/v4";
 //var app = express();
 let users = [
@@ -67,77 +67,7 @@ let comments = [
     post: "10"
   }
 ];
-const typeDefs = `
-  type Query {
-    users(query:String): [User]!
-    posts(query:String): [Post]!
-    comments: [Comment]!
-    me: User!
-    post: Post!
-    greeting(name:String): String!
-    float(num1:Float!,num2:Float!):Float!
-    add(number: [Float!]!): Float!
-    grades: [Int!]!
-    id: ID!
-    name:String!
-    age: Int!
-    employed:Boolean!
-    gpa: Float
-  }
 
-  input CreateUserInput {
-    name:String!
-    email:String!
-    age:Int
-  }
-
-  input CreatePostInput {
-    title:String!
-    body:String!
-    published:Boolean!
-    author:ID!
-  }
-
-  input CreateCommentInput {
-    text:String!
-    author:ID!
-    post:ID!
-  }
-
-  type Mutation {
-    createUser(data:CreateUserInput):User!
-    createPost(data:CreatePostInput):Post!
-    createComment(data:CreateCommentInput): Comment!
-    deleteUser(id:ID!):User!
-    deletePost(id:ID!):Post!
-    deleteComment(id:ID!):Comment!
-  }
-
-  type Comment {
-    id:ID!
-    text:String!
-    author: User!
-    post: Post!
-  }
-
-  type User {
-    id:ID!
-    email:String!
-    name:String!
-    age: Int
-    posts:[Post!]!
-    comments:[Comment!]!
-  }
-
-  type Post {
-    id:ID!
-    title:String!
-    body:String!
-    published:Boolean!
-    author: User!
-    comments: [Comment!]!
-  }
-`;
 const resolvers = {
   Query: {
     comments: (parent, args, ctx, info) => {
@@ -199,6 +129,9 @@ const resolvers = {
   Mutation: {
     deleteComment: (parent, args, ctx, info) => {
       let deletedComment = comments.find(comment => comment.id === args.id);
+      if (!deletedComment) {
+        throw new Error("No comment found");
+      }
       comments = comments.filter(comment => comment.id !== args.id);
       return deletedComment;
     },
@@ -293,6 +226,6 @@ const resolvers = {
       comments.filter(comment => parent.id === comment.author)
   }
 };
-const server = new GraphQLServer({typeDefs, resolvers});
+const server = new GraphQLServer({ typeDefs: "./schema.graphql", resolvers });
 
 server.start(() => console.log("Server is running on localhost:4000"));
