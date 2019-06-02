@@ -1,7 +1,7 @@
-import { GraphQLServer } from "graphql-yoga";
+import {GraphQLServer} from "graphql-yoga";
 import uuidv4 from "uuid/v4";
 //var app = express();
-const users = [
+let users = [
   {
     id: "1",
     name: "Stan",
@@ -18,7 +18,7 @@ const users = [
     email: "test3@test.com"
   }
 ];
-const posts = [
+let posts = [
   {
     id: "10",
     title: "test",
@@ -41,7 +41,7 @@ const posts = [
     author: "3"
   }
 ];
-const comments = [
+let comments = [
   {
     id: "24",
     text: "I am comment1",
@@ -108,6 +108,7 @@ const typeDefs = `
     createUser(data:CreateUserInput):User!
     createPost(data:CreatePostInput):Post!
     createComment(data:CreateCommentInput): Comment!
+    deleteUser(id:ID!):User!
   }
 
   type Comment {
@@ -194,6 +195,24 @@ const resolvers = {
     }
   },
   Mutation: {
+    deleteUser: (parent, args, ctx, info) => {
+      const userIndex = users.findIndex(user => user.id === args.id);
+      if (userIndex === -1) {
+        throw new Error("No user found");
+      }
+      const deletedUser = users.splice(userIndex, 1);
+      //console.log(deletedUser);
+      posts = posts.filter(post => {
+        let matched = post.author === args.id;
+        if (matched) {
+          comments = comments.filter(comment => comment.post !== post.id);
+        }
+
+        return !matched;
+      });
+      comments = comments.filter(comment => comment.author !== args.id);
+      return deletedUser[0];
+    },
     createPost: (parent, args, ctx, info) => {
       const userExists = users.some(user => user.id === args.data.author);
       if (!userExists) {
@@ -256,6 +275,6 @@ const resolvers = {
       comments.filter(comment => parent.id === comment.author)
   }
 };
-const server = new GraphQLServer({ typeDefs, resolvers });
+const server = new GraphQLServer({typeDefs, resolvers});
 
 server.start(() => console.log("Server is running on localhost:4000"));
