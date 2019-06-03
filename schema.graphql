@@ -34,7 +34,26 @@ input CreateCommentInput {
   post: ID!
 }
 
+input UpdateUserInput {
+  name: String
+  email: String
+  age: Int
+}
+
+input UpdatePostInput {
+  title: String
+  body: String
+  published: Boolean
+}
+
+input UpdateCommentInput {
+  text: String
+}
+
 type Mutation {
+  updateComment(id: ID!, data: UpdateCommentInput!): Comment!
+  updatePost(id: ID!, data: UpdatePostInput!): Post!
+  updateUser(id: ID!, data: UpdateUserInput!): User!
   createUser(data: CreateUserInput): User!
   createPost(data: CreatePostInput): Post!
   createComment(data: CreateCommentInput): Comment!
