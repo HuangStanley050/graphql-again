@@ -15,6 +15,10 @@ type Query {
   gpa: Float
 }
 
+type Subscription {
+  count: Int!
+}
+
 input CreateUserInput {
   name: String!
   email: String!
