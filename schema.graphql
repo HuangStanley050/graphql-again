@@ -17,6 +17,8 @@ type Query {
 
 type Subscription {
   count: Int!
+  comment(postID: ID!): Comment!
+  post: Post!
 }
 
 input CreateUserInput {
