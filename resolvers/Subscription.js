@@ -1,11 +1,11 @@
 const Subscription = {
   post: {
-    subscribe: (parent, args, { db, pubsub }, info) => {
+    subscribe: (parent, args, {db, pubsub}, info) => {
       return pubsub.asyncIterator("post");
     }
   },
   count: {
-    subscribe: (parent, args, { pubsub }, info) => {
+    subscribe: (parent, args, {pubsub}, info) => {
       let count = 0;
       setInterval(() => {
         count++;
@@ -17,7 +17,7 @@ const Subscription = {
     }
   },
   comment: {
-    subscribe: (parent, { postID }, { db, pubsub }, info) => {
+    subscribe: (parent, {postID}, {db, pubsub}, info) => {
       const post = db.posts.find(post => post.id === postID && post.published);
       if (!post) {
         throw new Error("Post not found");
