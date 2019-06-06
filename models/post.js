@@ -29,7 +29,7 @@ const postSchema = Schema(
       }
     ]
   },
-  {timestamps: true}
+  { timestamps: true }
 );
 
-export default mongoose.mondel("Post", postSchema);
+export default mongoose.model("Post", postSchema);
