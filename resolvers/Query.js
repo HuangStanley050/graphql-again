@@ -1,29 +1,41 @@
+import User from "../models/user";
+import Post from "../models/post";
+import Comment from "../models/comment";
+
 const Query = {
-  comments: (parent, args, { db }, info) => {
-    return db.comments;
+  comments: async (parent, args, {db}, info) => {
+    return await Comment.find({});
+    //return db.comments;
   },
-  posts: (parent, args, { db }, info) => {
+  posts: async (parent, args, {db}, info) => {
     if (!args.query) {
-      return db.posts;
+      return await Post.find({});
     }
-    return db.posts.filter(post => {
-      let tempTitle = post.title.toLowerCase();
-      let tempBody = post.body.toLowerCase();
-      if (
-        tempBody === args.query.toLowerCase() ||
-        tempTitle === args.query.toLowerCase()
-      ) {
-        return post;
-      }
-    });
+    // if (!args.query) {
+    //   return db.posts;
+    // }
+    // return db.posts.filter(post => {
+    //   let tempTitle = post.title.toLowerCase();
+    //   let tempBody = post.body.toLowerCase();
+    //   if (
+    //     tempBody === args.query.toLowerCase() ||
+    //     tempTitle === args.query.toLowerCase()
+    //   ) {
+    //     return post;
+    //   }
+    // });
   },
-  users: (parent, args, { db }, info) => {
+  users: async (parent, args, {db}, info) => {
     if (!args.query) {
-      return db.users;
+      let users = await User.find({});
+      return users;
     }
-    return db.users.filter(user => {
-      return user.name.toLowerCase().includes(args.query.toLowerCase());
-    });
+    // if (!args.query) {
+    //   return db.users;
+    // }
+    // return db.users.filter(user => {
+    //   return user.name.toLowerCase().includes(args.query.toLowerCase());
+    // });
   }
 };
 
