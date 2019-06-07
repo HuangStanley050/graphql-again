@@ -1,6 +1,7 @@
 import uuidv4 from "uuid/v4";
 import User from "../models/user";
 import Post from "../models/post";
+import Comment from "../models/comment";
 
 const Mutation = {
   updateComment: (parent, args, {db, pubsub}, info) => {
@@ -196,29 +197,45 @@ const Mutation = {
     // db.users.push(user);
     // return user;
   },
-  createComment: (parent, args, {db, pubsub}, info) => {
-    const userExists = db.users.some(user => user.id === args.data.author);
-    const postExists = db.posts.some(
-      post => post.id === args.data.post && post.published
-    );
+  createComment: async (parent, args, {db, pubsub}, info) => {
+    let userExists = await User.findOne({_id: args.data.author});
+    let postExists = await Post.findOne({_id: args.data.post});
 
-    if (!userExists || !postExists) {
-      throw new Error("User doesn't exists or the post hasn't been published");
+    if (!userExists || !postExists || !postExists.published) {
+      throw new Error(
+        "User doesn't exists or the post have not been published"
+      );
     }
-    const comment = {
-      id: uuidv4(),
-      ...args.data
-    };
-    db.comments.push(comment);
 
-    pubsub.publish(`comment ${args.data.post}`, {
-      comment: {
-        mutation: "CREATED",
-        data: comment
-      }
+    const newComment = new Comment({
+      ...args.data
     });
 
-    return comment;
+    let result = await newComment.save();
+    return result;
+
+    // const userExists = db.users.some(user => user.id === args.data.author);
+    // const postExists = db.posts.some(
+    //   post => post.id === args.data.post && post.published
+    // );
+    //
+    // if (!userExists || !postExists) {
+    //   throw new Error("User doesn't exists or the post hasn't been published");
+    // }
+    // const comment = {
+    //   id: uuidv4(),
+    //   ...args.data
+    // };
+    // db.comments.push(comment);
+    //
+    // pubsub.publish(`comment ${args.data.post}`, {
+    //   comment: {
+    //     mutation: "CREATED",
+    //     data: comment
+    //   }
+    // });
+    //
+    // return comment;
   }
 };
 
