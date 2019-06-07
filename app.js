@@ -1,4 +1,4 @@
-import { GraphQLServer, PubSub } from "graphql-yoga";
+import {GraphQLServer, PubSub} from "graphql-yoga";
 
 import Query from "./resolvers/Query";
 import Subscription from "./resolvers/Subscription";
@@ -25,14 +25,11 @@ const server = new GraphQLServer({
     Comment,
     Subscription
   },
-  context: { db, pubsub }
+  context: {db, pubsub}
 });
 
 mongoose
-  .connect(
-    ConnectString,
-    { useNewUrlParser: true }
-  )
+  .connect(ConnectString, {useNewUrlParser: true})
   .then(() => {
     server.start(() => console.log("Server is running on localhost:4000"));
   })
